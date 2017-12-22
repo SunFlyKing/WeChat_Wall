@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>推广会签到页</title>
+  <link rel="stylesheet" href="../css/wall.css">
+  <style>
+    .img{
+      width: 100px;
+      height: 100px;
+    }
+    .btn{
+      position: absolute;
+      right: 50px;
+      bottom: 20px;
+      z-index: 20;
+    }
+    .danmu {
+      width: 300px;
+      height: 40px;
+      position: absolute;
+      overflow: hidden;
+      color: #000;
+      font-size: 2em;
+      line-height: 1.5em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+
+  </style>
+</head>
+<body>
+<div class="wrapbg">
+  <div class="wrapper" id="boxDom">
+    <div class="header">
+      <h2>
+        微信大屏幕-签到
+      </h2>
+      <div class="num-t left">
+        <p><em class="messageTotal" id="messageTotal">0</em><span>人签到</span></p>
+      </div>
+    </div>
+    <div class="fl-layer checkin-pop">
+      <ul class="heads-list clearfix">
+
+      </ul>
+    </div>
+    <div>
+      <div id="view-fullscreen" title="全屏"></div>
+    </div>
+
+  </div>
+  <input type="button" value="开启弹幕" class="btn">
+</div>
+<script src="http://cdn.bootcss.com/jquery/2.2.3/jquery.js"></script>
+
+<script>
+    //全屏相关函数
+    (function() {
+        var viewFullScreen = document.getElementById("view-fullscreen");
+        if (viewFullScreen) {
+            viewFullScreen.addEventListener("click", function () {
+                var docElm = document.documentElement;
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen();
+                }
+                else if (docElm.msRequestFullscreen) {
+                    docElm.msRequestFullscreen();
+                }
+                else if (docElm.mozRequestFullScreen) {
+                    docElm.mozRequestFullScreen();
+                }
+                else if (docElm.webkitRequestFullScreen) {
+                    docElm.webkitRequestFullScreen();
+                }
+            }, false);
+        }
+
+        var cancelFullScreen = document.getElementById("cancel-fullscreen");
+        if (cancelFullScreen) {
+            cancelFullScreen.addEventListener("click", function () {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+                else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                }
+                else if (document.webkitCancelFullScreen) {
+                    document.webkitCancelFullScreen();
+                }
+            }, false);
+        }
+
+
+        var id = setInterval(function () {
+
+            $.ajax({
+                type: "GET",
+                url: "http://www.sfx520.top/wx_wall/wx/showUserinfo.php",
+                data: {username:$("#username").val(), content:$("#content").val()},
+                dataType: "json",
+                success: function(data){
+
+                    var count = data.length;
+                    $('#messageTotal').text(count);
+//                    data = JSON.parse(data);
+                    var html = '';
+                    $.each(data, function(Index, item){
+
+                        html+='<li id="li">';
+                        html+='<img src="'+item[1]+'" class="img">';
+
+                        html+='<span>'+item[0];
+                        html+='</span>';
+                        html+='</li>';
+                    });
+                    $('.heads-list').html(html);
+                }
+            });
+        },2000);
+
+        $('.btn').click(function (el) {
+            $('#id').hide();
+        });
+
+    })();
+
+</script>
+<script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+
+<script type="text/javascript">
+    var goEasy = new GoEasy({
+        appkey: 'BC-62615b4e8f2b417f95d01c7dad82577b'
+    });
+    //GoEasy-OTP可以对appkey进行有效保护，详情请参考：GoEasy-Reference
+    goEasy.subscribe({
+        channel: 'sfx',
+        onMessage: function(message){
+
+            var colors = ["red", "green", "hotpink", "pink", "cyan", "yellowgreen", "purple", "deepskyblue"];
+
+                var index=parseInt(Math.random()*colors.length);
+                var top=parseInt(Math.random()*500);
+                $('<span></span>')
+                    .text(message.content)
+                    .css({
+                        color:colors[index],
+                        position:'absolute',
+                        left:'1400px',
+                        top:top
+                    })
+                    .animate({left:-500},10000,function(){
+                        $(this).remove();
+                    })
+                    .addClass('danmu')
+                    .appendTo($('#boxDom'));
+
+
+        }
+    });
+</script>
+</body>
+</html>
